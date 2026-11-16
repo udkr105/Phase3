@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business Task Manager</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: "Segoe UI", Arial, sans-serif;
+            background: #f3f5f9;
+            color: #1f2937;
+        }
+        header {
+            background: #1e3a5f;
+            color: #fff;
+            padding: 20px 0;
+        }
+        .container { max-width: 960px; margin: 0 auto; padding: 0 20px; }
+        h1 { margin: 0; font-size: 1.5rem; }
+        main { padding: 30px 0; }
+        .card {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        form.add { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+        label { display: flex; flex-direction: column; gap: 6px; font-size: 0.9rem; }
+        input, select {
+            width: 100%;
+            min-width: 0;
+            padding: 10px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 1rem;
+            background: #fff;
+            color: inherit;
+        }
+        input:focus, select:focus { outline: 2px solid #2f6fba; border-color: transparent; }
+        button {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            color: #fff;
+        }
+        .btn-add { background: #2f6fba; }
+        .btn-add:hover { background: #255a99; }
+        .btn-delete { background: #c0392b; padding: 6px 12px; }
+        .btn-delete:hover { background: #a02e22; }
+        h2 { margin: 0 0 12px; font-size: 1.1rem; }
+        .table-wrap { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td {
+            text-align: left;
+            padding: 12px 10px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        td:first-child { overflow-wrap: anywhere; min-width: 120px; }
+        td:last-child, td:nth-child(4) { white-space: nowrap; }
+        @media (max-width: 540px) {
+            form.add { grid-template-columns: minmax(0, 1fr); }
+            .card { padding: 14px; }
+        }
+        .empty { color: #6b7280; text-align: center; padding: 10px 0; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container"><h1>Business Task Manager</h1></div>
+    </header>
+    <main class="container">
+        <div class="card">
+            <form class="add" action="{{ url_for('add_task') }}" method="post">
+                <label>Task name
+                    <input type="text" name="task" placeholder="Enter a new task" required maxlength="200" autofocus>
+                </label>
+                <label>Priority
+                    <select name="priority" required>
+                        <option value="" disabled selected>Select priority</option>
+                        <option value="High">High</option>
+                        <option value="Medium">Medium</option>
+                        <option value="Low">Low</option>
+                    </select>
+                </label>
+                <label>Category
+                    <select name="category" required>
+                        <option value="" disabled selected>Select category</option>
+                        <option value="Work">Work</option>
+                        <option value="Personal">Personal</option>
+                        <option value="Health">Health</option>
+                    </select>
+                </label>
+                <label>Due date
+                    <input type="date" name="due_date" required>
+                </label>
+                <button type="submit" class="btn-add">Add Task</button>
+            </form>
+        </div>
+        <div class="card">
+            <h2>Tasks ({{ tasks|length }})</h2>
+            {% if tasks %}
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th scope="col">Task name</th>
+                            <th scope="col">Priority</th>
+                            <th scope="col">Category</th>
+                            <th scope="col">Due date</th>
+                            <th scope="col">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for task_id, task in tasks %}
+                        <tr>
+                            <td>{{ task.task }}</td>
+                            <td>{{ task.priority }}</td>
+                            <td>{{ task.category }}</td>
+                            <td>{{ task.due_date }}</td>
+                            <td>
+                                <form action="{{ url_for('delete_task', task_id=task_id) }}" method="post">
+                                    <button type="submit" class="btn-delete" aria-label="Delete {{ task.task }}">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="empty">No tasks yet. Add one above.</p>
+            {% endif %}
+        </div>
+    </main>
+</body>
+</html>
